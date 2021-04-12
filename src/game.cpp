@@ -1,6 +1,7 @@
 #include "game.h"
 #include <iostream>
 #include "SDL.h"
+#include <thread>
 
 Game::Game(std::size_t grid_width, std::size_t grid_height)
     : snake(grid_width, grid_height),
@@ -8,6 +9,7 @@ Game::Game(std::size_t grid_width, std::size_t grid_height)
       random_w(0, static_cast<int>(grid_width - 1)),
       random_h(0, static_cast<int>(grid_height - 1)) {
   PlaceFood();
+  bonuspoints = new Bonuspoints;
 }
 
 void Game::Run(Controller const &controller, Renderer &renderer,
@@ -19,13 +21,22 @@ void Game::Run(Controller const &controller, Renderer &renderer,
   int frame_count = 0;
   bool running = true;
 
+  //std::thread this->bonus_thread{&Bonuspoints::startSession, bonuspoints};
+  std::thread bonus_thread{&Bonuspoints::startSession, bonuspoints};
+
   while (running) {
     frame_start = SDL_GetTicks();
 
     // Input, Update, Render - the main game loop.
     controller.HandleInput(running, snake);
     Update();
-    renderer.Render(snake, food);
+    if (session::bonus_session == bonuspoints->get_Current_Session()) {
+      std::cout << "in bonus session\n" ;
+      renderer.Render(snake, food, bonus_food);
+    } else {
+      std::cout << "in normal session\n" ;
+      renderer.Render(snake, food);
+    }
 
     frame_end = SDL_GetTicks();
 
@@ -48,6 +59,7 @@ void Game::Run(Controller const &controller, Renderer &renderer,
       SDL_Delay(target_frame_duration - frame_duration);
     }
   }
+  //bonus_thread.join();
 }
 
 void Game::PlaceFood() {
@@ -63,6 +75,21 @@ void Game::PlaceFood() {
       return;
     }
   }
+}
+
+void Game::PlaceBonusFood() {
+  int x, y;
+  //while (true) {
+    x = random_w(engine);
+    y = random_h(engine);
+    // Check that the location is not occupied by a snake item before placing
+    // food.
+    if (!snake.SnakeCell(x, y)) {
+      bonus_food.x = x;
+      bonus_food.y = y;
+      return;
+    }
+  //}
 }
 
 void Game::Update() {
@@ -81,7 +108,25 @@ void Game::Update() {
     snake.GrowBody();
     snake.speed += 0.02;
   }
+
+  // Check and place bonus food
+  if (session::bonus_session == bonuspoints->get_Current_Session()) {
+    int bonus_new_x = static_cast<int>(snake.head_x);
+    int bonus_new_y = static_cast<int>(snake.head_y);
+    if (bonus_food.x == bonus_new_x &&
+        bonus_food.y == bonus_new_y) {
+        //TODO: update score based on bonus won
+        score++;
+        PlaceBonusFood();
+        snake.GrowBody();
+        snake.speed += 0.02;
+    }
+  }
 }
 
 int Game::GetScore() const { return score; }
 int Game::GetSize() const { return snake.size; }
+
+Game::~Game(){
+  bonus_thread.join();
+}
