@@ -22,8 +22,9 @@ class Game {
   Snake snake;
   SDL_Point food;
   SDL_Point bonus_food;
+  //std::unique_ptr<Bonuspoints> bonuspoints;
   Bonuspoints *bonuspoints;
-  std::thread bonus_thread;
+  std::vector<std::thread> bonus_threads;
 
   std::random_device dev;
   std::mt19937 engine;

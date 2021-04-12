@@ -14,6 +14,7 @@ Special food appears on game screen and
 */
 
 enum awards{
+    ignore = -1,
     no_chocolate = 0,
     chocolate,
     dark_chocolate // extra point when food is placed in difficult location
@@ -45,15 +46,18 @@ public:
   ~Bonuspoints(){};
 
   session get_Current_Session();
-  void initiate(Bonuspoints *bonuspoints);
+  void resetThread();
   void startSession();
+  void informSuccess();
+  bool getBonusConsumed();
 private:
     std::random_device generator;
     std::mt19937 random_time;
     // Specify the interval to be between 10 to 12 sec
     std::uniform_int_distribution<> interval{10000, 12000};
     session _current_session;
-    MessageQueue<int> _points;
+    MessageQueue<awards> _points;
+    bool bonus_consumed;
 
     std::condition_variable _condition;
     std::mutex _mutex;

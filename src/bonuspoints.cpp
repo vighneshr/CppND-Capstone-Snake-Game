@@ -24,24 +24,36 @@ session Bonuspoints::get_Current_Session() {
 
 Bonuspoints::Bonuspoints():random_time(generator()) {
   _current_session = session::normal_session;
+  bonus_consumed = false;
 }
 
-void Bonuspoints::initiate(Bonuspoints *bonuspoints){
+void Bonuspoints::resetThread(){
+  while(true){
+    auto msg = _points.receive();
+    std::cout << "msg received: " << msg << "\n";
+    if (awards::chocolate == msg) {
+      bonus_consumed = true;
+    } else {
+      bonus_consumed = false;
+    }
+  }
+}
 
-    return;
+bool Bonuspoints::getBonusConsumed(){
+  return bonus_consumed;
+}
+
+void Bonuspoints::informSuccess(){
+  std::cout << "informing \n";
+  _points.send(awards::chocolate);
+  return;
 }
 
 void Bonuspoints::startSession(){
     std::cout << "running" << std::endl;
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
     std::chrono::time_point<std::chrono::system_clock> lastUpdate;
-/*
-    std::random_device rd;//To get random value for cycle duration between 10 and 12 seconds.
-    std::mt19937 eng(rd());
-    std::uniform_int_distribution<> distr(10000, 12000);
-    double cycleDuration = distr(eng); //Set the cycle duration with random value between 10 and 12
-*/
-    // init stop watch
+
     lastUpdate = std::chrono::system_clock::now();
     while (true)
     {
@@ -51,9 +63,9 @@ void Bonuspoints::startSession(){
 
         // compute time difference to stop watch
         long timeSinceLastUpdate = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - lastUpdate).count();
-        if (timeSinceLastUpdate >= cycleDuration)
+        if (timeSinceLastUpdate >= cycleDuration || getBonusConsumed())
         {
-            //Toggles the current phase of the traffic light between red and green
+            //Toggles the session
           	if(_current_session == bonus_session)
             {
               _current_session = normal_session;
@@ -62,17 +74,11 @@ void Bonuspoints::startSession(){
             {
               _current_session = bonus_session;
             }
-          
-          //sends an update method to the message queue using move semantics.
-          //TrafficLight::_message.send(std::move(_currentPhase));
-          //_points.send(std::move(_current_session));
-          
+
+          _points.send(awards::no_chocolate);
           // reset stop watch for next cycle
           lastUpdate = std::chrono::system_clock::now();
-          
         }
     } // eof simulation loop
-
-
     return;
 }
