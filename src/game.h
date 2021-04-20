@@ -8,10 +8,11 @@
 #include "renderer.h"
 #include "snake.h"
 #include "bonuspoints.h"
+#include "layout.h"
 
 class Game {
  public:
-  Game(std::size_t grid_width, std::size_t grid_height);
+  Game(std::size_t grid_width, std::size_t grid_height, int level = 0);
   void Run(Controller const &controller, Renderer &renderer,
            std::size_t target_frame_duration);
   bool LayoutCell(int x, int y);
@@ -21,12 +22,15 @@ class Game {
 
  private:
   Snake snake;
+  Layout layout;
   SDL_Point food;
   SDL_Point bonus_food;
-  std::vector<SDL_Point> layout;
+  //std::vector<SDL_Point> layout;
+  std::vector<SDL_Point> gamelayout;
   //std::unique_ptr<Bonuspoints> bonuspoints;
   Bonuspoints *bonuspoints;
   std::vector<std::thread> bonus_threads;
+  int game_level{0};
 
   std::random_device dev;
   std::mt19937 engine;
