@@ -15,6 +15,7 @@ class Snake {
         head_y(grid_height / 2) {}
 
   void Update();
+  void UpdateLayout(const std::vector<SDL_Point> &layout);
 
   void GrowBody();
   bool SnakeCell(int x, int y);
@@ -35,6 +36,7 @@ class Snake {
   bool growing{false};
   int grid_width;
   int grid_height;
+  std::vector<SDL_Point> walls;
 };
 
 #endif

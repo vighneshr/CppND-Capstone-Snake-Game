@@ -10,8 +10,22 @@ Game::Game(std::size_t grid_width, std::size_t grid_height)
       random_h(0, static_cast<int>(grid_height - 1)) {
   PlaceFood();
   PlaceBonusFood();
+  SetLayout();
   bonuspoints = new Bonuspoints;
 }
+
+void Game::SetLayout() {
+  SDL_Point temp;
+  int x = 20;
+  int y = 10;
+  temp.x = x;
+  temp.y = y;
+  layout.emplace_back(temp);
+  temp.x = 19;
+  temp.y = 10;
+  layout.emplace_back(temp);
+}
+
 
 void Game::Run(Controller const &controller, Renderer &renderer,
                std::size_t target_frame_duration) {
@@ -26,6 +40,8 @@ void Game::Run(Controller const &controller, Renderer &renderer,
   //std::thread bonus_thread{&Bonuspoints::startSession, bonuspoints};
   bonus_threads.emplace_back(std::thread{&Bonuspoints::startSession, bonuspoints});
   bonus_threads.emplace_back(std::thread{&Bonuspoints::resetThread, bonuspoints});
+  snake.UpdateLayout(layout);
+  //renderer.SetLayout(temp);
 
   while (running) {
     frame_start = SDL_GetTicks();
@@ -34,9 +50,9 @@ void Game::Run(Controller const &controller, Renderer &renderer,
     controller.HandleInput(running, snake);
     Update();
     if (session::bonus_session == bonuspoints->get_Current_Session() && !bonuspoints->getBonusConsumed()) {
-      renderer.Render(snake, food, bonus_food);
+      renderer.Render(snake, food, layout, bonus_food);
     } else {
-      renderer.Render(snake, food);
+      renderer.Render(snake, food, layout);
     }
 
     frame_end = SDL_GetTicks();
@@ -62,6 +78,15 @@ void Game::Run(Controller const &controller, Renderer &renderer,
   }
 }
 
+bool Game::LayoutCell(int x, int y) {
+  for (auto const &item : layout) {
+    if (x == item.x && y == item.y) {
+      return true;
+    }
+  }
+  return false;
+}
+
 void Game::PlaceFood() {
   int x, y;
   while (true) {
@@ -69,7 +94,7 @@ void Game::PlaceFood() {
     y = random_h(engine);
     // Check that the location is not occupied by a snake item before placing
     // food.
-    if (!snake.SnakeCell(x, y)) {
+    if (!snake.SnakeCell(x, y) && !LayoutCell(x, y)) {
       food.x = x;
       food.y = y;
       return;
@@ -84,7 +109,7 @@ void Game::PlaceBonusFood() {
     y = random_h(engine);
     // Check that the location is not occupied by a snake item before placing
     // food.
-    if (!snake.SnakeCell(x, y)) {
+    if (!snake.SnakeCell(x, y) && !LayoutCell(x, y)) {
       bonus_food.x = x;
       bonus_food.y = y;
       return;

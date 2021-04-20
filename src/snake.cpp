@@ -2,6 +2,13 @@
 #include <cmath>
 #include <iostream>
 
+/* Update internal layout variable */
+void Snake::UpdateLayout(const std::vector<SDL_Point> &layout) {
+  for (SDL_Point rect: layout) {
+    walls.emplace_back(rect);
+  }
+}
+
 void Snake::Update() {
   SDL_Point prev_cell{
       static_cast<int>(head_x),
@@ -58,6 +65,12 @@ void Snake::UpdateBody(SDL_Point &current_head_cell, SDL_Point &prev_head_cell) 
   // Check if the snake has died.
   for (auto const &item : body) {
     if (current_head_cell.x == item.x && current_head_cell.y == item.y) {
+      alive = false;
+    }
+  }
+  for (auto const &point : walls) {
+    if (current_head_cell.x == point.x && current_head_cell.y == point.y) {
+      std::cout << "wall hit!!!!\n";
       alive = false;
     }
   }

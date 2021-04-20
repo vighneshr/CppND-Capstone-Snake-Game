@@ -14,6 +14,7 @@ class Game {
   Game(std::size_t grid_width, std::size_t grid_height);
   void Run(Controller const &controller, Renderer &renderer,
            std::size_t target_frame_duration);
+  bool LayoutCell(int x, int y);
   int GetScore() const;
   int GetSize() const;
   ~Game();
@@ -22,6 +23,7 @@ class Game {
   Snake snake;
   SDL_Point food;
   SDL_Point bonus_food;
+  std::vector<SDL_Point> layout;
   //std::unique_ptr<Bonuspoints> bonuspoints;
   Bonuspoints *bonuspoints;
   std::vector<std::thread> bonus_threads;
@@ -36,6 +38,7 @@ class Game {
   void PlaceFood();
   void PlaceBonusFood();
   void Update();
+  void SetLayout();
 };
 
 #endif
