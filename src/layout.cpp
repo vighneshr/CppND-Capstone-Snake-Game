@@ -17,7 +17,6 @@ vector<vector<int>> Layout::ReadBoardFile(string path) {
   if (myfile) {
     string line;
     while (getline(myfile, line)) {
-        cout << line << std::endl;
       board.push_back(ParseLine(line));
     }
   }
@@ -31,21 +30,26 @@ void Layout::PopulatePoints(
   for (int i = 0; i < board.size(); i++) {
     for (int j = 0; j < board[i].size(); j++) {
       if (board[j][i] == 1) {
-          cout << "i : " << i << "j : " << j << " ...\n";
           SDL_Point temp{i, j};
-          gamelayout.emplace_back(temp);
+          gamelayout.emplace_back(std::move(temp));
       }
     }
   }
 }
 
-bool Layout::Construct(int level, vector<SDL_Point> &gamelayout) {
-  vector<vector<int>> board;
-  if (level == 0) {
-    board = ReadBoardFile("../board/board_level0.txt");
-  } else if (level == 1) {
-    board = ReadBoardFile("../board/board_level1.txt");
+bool Layout::setup() {
+  //precheck and get filename
+  if (getLevel() > getAvailableLevels()) {
+    return false;
   }
+  filename = "../board/board_level" + std::to_string(getLevel()) + ".txt";
+
+  return true;
+}
+
+bool Layout::Construct(vector<SDL_Point> &gamelayout) {
+  vector<vector<int>> board;
+  board = ReadBoardFile(filename);
   PopulatePoints(board, gamelayout);
   return true;
 }

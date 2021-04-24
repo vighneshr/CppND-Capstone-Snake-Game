@@ -3,20 +3,29 @@
 #include "SDL.h"
 #include <thread>
 
-Game::Game(std::size_t grid_width, std::size_t grid_height, int level)
+int PreGame::level;
+
+Game::Game(std::size_t grid_width, std::size_t grid_height)
     : snake(grid_width, grid_height),
       engine(dev()),
       random_w(0, static_cast<int>(grid_width - 1)),
-      random_h(0, static_cast<int>(grid_height - 1)),
-      game_level(level) {
+      random_h(0, static_cast<int>(grid_height - 1)){
   PlaceFood();
   PlaceBonusFood();
-  layout.Construct(game_level, gamelayout);
   bonuspoints = new Bonuspoints;
+}
+
+bool Game::Load() {
+  // pregame section
+  if (setup() == true) {
+    return layout.setup();
+  }
+  return false;
 }
 
 void Game::Run(Controller const &controller, Renderer &renderer,
                std::size_t target_frame_duration) {
+  // game layout loaded and start now
   Uint32 title_timestamp = SDL_GetTicks();
   Uint32 frame_start;
   Uint32 frame_end;
@@ -24,11 +33,13 @@ void Game::Run(Controller const &controller, Renderer &renderer,
   int frame_count = 0;
   bool running = true;
 
+  layout.Construct(gamelayout);
+  snake.UpdateLayout(gamelayout);
+
   //std::thread this->bonus_thread{&Bonuspoints::startSession, bonuspoints};
   //std::thread bonus_thread{&Bonuspoints::startSession, bonuspoints};
   bonus_threads.emplace_back(std::thread{&Bonuspoints::startSession, bonuspoints});
   bonus_threads.emplace_back(std::thread{&Bonuspoints::resetThread, bonuspoints});
-  snake.UpdateLayout(gamelayout);
 
   while (running) {
     frame_start = SDL_GetTicks();
@@ -141,9 +152,4 @@ void Game::Update() {
 int Game::GetScore() const { return score; }
 int Game::GetSize() const { return snake.size; }
 
-Game::~Game(){
-  //bonus_thread.join();
-  //for (auto t : bonus_threads) {
-   // t.join();
-  //}
-}
+//Game::~Game(){}
