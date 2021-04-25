@@ -12,7 +12,7 @@ Game::Game(std::size_t grid_width, std::size_t grid_height)
       random_h(0, static_cast<int>(grid_height - 1)){
   PlaceFood();
   PlaceBonusFood();
-  bonuspoints = new Bonuspoints;
+  bonuspoints = std::make_unique<Bonuspoints>();
 }
 
 bool Game::Load() {
@@ -36,10 +36,8 @@ void Game::Run(Controller const &controller, Renderer &renderer,
   layout.Construct(gamelayout);
   snake.UpdateLayout(gamelayout);
 
-  //std::thread this->bonus_thread{&Bonuspoints::startSession, bonuspoints};
-  //std::thread bonus_thread{&Bonuspoints::startSession, bonuspoints};
-  bonus_threads.emplace_back(std::thread{&Bonuspoints::startSession, bonuspoints});
-  bonus_threads.emplace_back(std::thread{&Bonuspoints::resetThread, bonuspoints});
+  bonus_threads.emplace_back(std::move(std::thread{&Bonuspoints::startSession, bonuspoints.get()}));
+  bonus_threads.emplace_back(std::move(std::thread{&Bonuspoints::resetThread, bonuspoints.get()}));
 
   while (running) {
     frame_start = SDL_GetTicks();
@@ -74,6 +72,7 @@ void Game::Run(Controller const &controller, Renderer &renderer,
       SDL_Delay(target_frame_duration - frame_duration);
     }
   }
+  bonuspoints->informEndGame();
 }
 
 bool Game::LayoutCell(int x, int y) {
@@ -116,7 +115,10 @@ void Game::PlaceBonusFood() {
 }
 
 void Game::Update() {
-  if (!snake.alive) return;
+  if (!snake.alive) {
+    //bonuspoints->informEndGame();
+    return;
+  }
 
   snake.Update();
 
@@ -152,4 +154,8 @@ void Game::Update() {
 int Game::GetScore() const { return score; }
 int Game::GetSize() const { return snake.size; }
 
-//Game::~Game(){}
+Game::~Game(){
+  std::for_each(bonus_threads.begin(), bonus_threads.end(), [](std::thread &t) {
+        t.join();
+  });
+}

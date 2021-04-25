@@ -3,6 +3,7 @@
 
 #include <random>
 #include <iostream>
+#include <algorithm>
 #include "pregame.h"
 #include "SDL.h"
 #include "controller.h"
@@ -20,7 +21,7 @@ class Game : public PreGame {
   bool LayoutCell(int x, int y);
   int GetScore() const;
   int GetSize() const;
-  ~Game(){};
+  ~Game();
 
  private:
   Snake snake;
@@ -28,8 +29,7 @@ class Game : public PreGame {
   SDL_Point food;
   SDL_Point bonus_food;
   std::vector<SDL_Point> gamelayout;
-  //std::unique_ptr<Bonuspoints> bonuspoints;
-  Bonuspoints *bonuspoints;
+  std::unique_ptr<Bonuspoints> bonuspoints;
   std::vector<std::thread> bonus_threads;
 
   std::random_device dev;

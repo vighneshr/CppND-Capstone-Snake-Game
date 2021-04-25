@@ -22,21 +22,33 @@ session Bonuspoints::get_Current_Session() {
     return _current_session;
 }
 
-Bonuspoints::Bonuspoints():random_time(generator()) {
+Bonuspoints::Bonuspoints() {
   _current_session = session::normal_session;
   bonus_consumed = false;
+  _points = new MessageQueue<msgs>;
+}
+
+Bonuspoints::~Bonuspoints() {
+  if (_points != nullptr) {
+    delete _points;
+    _points = nullptr;
+  }
 }
 
 void Bonuspoints::resetThread(){
   while(true){
-    auto msg = _points.receive();
-    std::cout << "msg received: " << msg << "\n";
-    if (awards::chocolate == msg) {
+    auto rcvd_msg = _points->receive();
+    std::cout << "msg received: " << rcvd_msg << "\n";
+    if (msgs::end_game == rcvd_msg){
+      destroy_bonus = true;
+      break;
+    } else if (msgs::bonus == rcvd_msg) {
       bonus_consumed = true;
     } else {
       bonus_consumed = false;
     }
   }
+  return;
 }
 
 bool Bonuspoints::getBonusConsumed(){
@@ -45,13 +57,23 @@ bool Bonuspoints::getBonusConsumed(){
 
 void Bonuspoints::informSuccess(){
   std::cout << "informing \n";
-  _points.send(awards::chocolate);
+  _points->send(msgs::bonus);
+  return;
+}
+
+void Bonuspoints::informEndGame(){
+  std::cout << "informingEndGame \n";
+  _points->send(msgs::end_game);
   return;
 }
 
 void Bonuspoints::startSession(){
+    std::random_device generator;
+    std::mt19937 random_time(generator());
+    // Specify the interval to be between 10 to 12 sec
+    std::uniform_int_distribution<> interval{10000, 12000};
+
     std::cout << "running" << std::endl;
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
     std::chrono::time_point<std::chrono::system_clock> lastUpdate;
 
     lastUpdate = std::chrono::system_clock::now();
@@ -63,8 +85,9 @@ void Bonuspoints::startSession(){
 
         // compute time difference to stop watch
         long timeSinceLastUpdate = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - lastUpdate).count();
-        if (timeSinceLastUpdate >= cycleDuration || getBonusConsumed())
-        {
+        if (destroy_bonus) {
+          break;
+        } else if (timeSinceLastUpdate >= cycleDuration || getBonusConsumed()) {
             //Toggles the session
           	if(_current_session == bonus_session)
             {
@@ -75,7 +98,7 @@ void Bonuspoints::startSession(){
               _current_session = bonus_session;
             }
 
-          _points.send(awards::no_chocolate);
+          _points->send(msgs::no_bonus);
           // reset stop watch for next cycle
           lastUpdate = std::chrono::system_clock::now();
         }

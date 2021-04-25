@@ -13,11 +13,11 @@ Special food appears on game screen and
 
 */
 
-enum awards{
+enum msgs{
     ignore = -1,
-    no_chocolate = 0,
-    chocolate,
-    dark_chocolate // extra point when food is placed in difficult location
+    no_bonus = 0,
+    bonus,
+    end_game // extra point when food is placed in difficult location
 };
 
 //session is to indicate if bonus score is active or not
@@ -43,23 +43,18 @@ private:
 class Bonuspoints {
 public:
   Bonuspoints();
-  ~Bonuspoints(){};
+  ~Bonuspoints();
 
   session get_Current_Session();
   void resetThread();
   void startSession();
   void informSuccess();
+  void informEndGame();
   bool getBonusConsumed();
 private:
-    std::random_device generator;
-    std::mt19937 random_time;
-    // Specify the interval to be between 10 to 12 sec
-    std::uniform_int_distribution<> interval{10000, 12000};
     session _current_session;
-    MessageQueue<awards> _points;
+    MessageQueue<msgs> *_points;
     bool bonus_consumed;
-
-    std::condition_variable _condition;
-    std::mutex _mutex;
+    bool destroy_bonus;
 };
 #endif
