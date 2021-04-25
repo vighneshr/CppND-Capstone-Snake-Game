@@ -36,35 +36,35 @@ In this project, you can build your own C++ application or extend this Snake gam
 2. User input is required within 5 seconds or game exits
 
 ## Addressing Rubic points
-1. Loops, Functions, I/O:
-   The project demonstrates an understanding of C++ functions and control structures : Demonstrated throughtout the project
-   The project reads data from a file and process the data, or the program writes data to a file : Demonstrated in layout.cpp line#46,14
-   The project accepts user input and processes the input : Demonstrated in pregame.h line# 18 - 62
+* Loops, Functions, I/O:
+   * The project demonstrates an understanding of C++ functions and control structures : Demonstrated throughtout the project
+   * The project reads data from a file and process the data, or the program writes data to a file : Demonstrated in layout.cpp line#46,14
+   * The project accepts user input and processes the input : Demonstrated in pregame.h line# 18 - 62
 
-2. Object Oriented Programming
-   The project uses Object Oriented Programming techniques :  Demostrated throughtout the project
-   Classes use appropriate access specifiers for class members : Demonstrated throughtout the project classes
-   Class constructors utilize member initialization lists : Demonstrated in snake.h line#11
-   Classes abstract implementation details from their interfaces : Demostrated throughtout the project
-   Classes encapsulate behavior : Demonstrated in bonuspoints.cpp line#21, 54
-   Classes follow an appropriate inheritance hierarchy : Demonstrated in game.h pregame.h layout.h
-   Overloaded functions allow the same function to operate on different parameters : Demonstrated in renderer.cpp line# 48, 96
-   Derived class functions override virtual base class functions : Demonstrated in game.h line#102, pregame line#37, layout.h#22
-   Templates generalize functions in the project : Demonstrated in bonuspoints.h line#30
+* Object Oriented Programming
+   * The project uses Object Oriented Programming techniques :  Demostrated throughtout the project
+   * Classes use appropriate access specifiers for class members : Demonstrated throughtout the project classes
+   * Class constructors utilize member initialization lists : Demonstrated in snake.h line#11
+   * Classes abstract implementation details from their interfaces : Demostrated throughtout the project
+   * Classes encapsulate behavior : Demonstrated in bonuspoints.cpp line#21, 54
+   * Classes follow an appropriate inheritance hierarchy : Demonstrated in game.h pregame.h layout.h
+   * Overloaded functions allow the same function to operate on different parameters : Demonstrated in renderer.cpp line# 48, 96
+   * Derived class functions override virtual base class functions : Demonstrated in game.h line#102, pregame line#37, layout.h#22
+   * Templates generalize functions in the project : Demonstrated in bonuspoints.h line#30
  
-3. Memory Management
-   The project makes use of references in function declarations : Demostrated throughtout the project functions wherever appropriate
-   The project uses destructors appropriately : Demonstrated in bonuspoints.cpp line#31
-   The project uses scope / Resource Acquisition Is Initialization (RAII) where appropriate : Demonstrated in game.cpp
-   The project follows the Rule of 5 : Demonstrated in game.h line#17 - 68 and game.cpp line# 31, 53
-   The project uses move semantics to move data, instead of copying it, where possible : Demonstrated in renderer.cpp line#44
-   The project uses smart pointers instead of raw pointers :  Demonstrated in game.h line#87
+* Memory Management
+   * The project makes use of references in function declarations : Demostrated throughtout the project functions wherever appropriate
+   * The project uses destructors appropriately : Demonstrated in bonuspoints.cpp line#31
+   * The project uses scope / Resource Acquisition Is Initialization (RAII) where appropriate : Demonstrated in game.cpp
+   * The project follows the Rule of 5 : Demonstrated in game.h line#17 - 68 and game.cpp line# 31, 53
+   * The project uses move semantics to move data, instead of copying it, where possible : Demonstrated in renderer.cpp line#44
+   * The project uses smart pointers instead of raw pointers :  Demonstrated in game.h line#87
    
-4. Concurrency
-   The project uses multithreading : Demonstrated in game.h line#88 and bonuspoints.cpp
-   A promise and future is used in the project : Demonstrated in pregame.h
-   A mutex or lock is used in the project : Demonstrated in bonuspoints.h line#40
-   A condition variable is used in the project : Demonstrated in bonuspoints.h line#39
+* Concurrency
+   * The project uses multithreading : Demonstrated in game.h line#88 and bonuspoints.cpp
+   * A promise and future is used in the project : Demonstrated in pregame.h
+   * A mutex or lock is used in the project : Demonstrated in bonuspoints.h line#40
+   * A condition variable is used in the project : Demonstrated in bonuspoints.h line#39
 
 ## CC Attribution-ShareAlike 4.0 International
 
