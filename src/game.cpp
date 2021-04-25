@@ -23,6 +23,23 @@ bool Game::Load() {
   return false;
 }
 
+void Game::Construct() {
+    std::vector<SDL_Point> temp;
+    layout.Construct(temp);
+    int l = temp.size();
+    int count = 0;
+    // Demostrate rule of 5
+    Portable p1(l);
+    Portable *p = &p1;
+    for (const SDL_Point i : temp) {
+      p->point[count].x = i.x;
+      p->point[count].y = i.y;
+      count++;
+      gamelayout.emplace_back(i);
+    }
+    arr = std::move(*p);
+}
+
 void Game::Run(Controller const &controller, Renderer &renderer,
                std::size_t target_frame_duration) {
   // game layout loaded and start now
@@ -33,7 +50,10 @@ void Game::Run(Controller const &controller, Renderer &renderer,
   int frame_count = 0;
   bool running = true;
 
-  layout.Construct(gamelayout);
+  // demo of rule of 5
+  Construct();
+  renderer.populateLayout(arr);
+
   snake.UpdateLayout(gamelayout);
 
   bonus_threads.emplace_back(std::move(std::thread{&Bonuspoints::startSession, bonuspoints.get()}));
@@ -46,9 +66,9 @@ void Game::Run(Controller const &controller, Renderer &renderer,
     controller.HandleInput(running, snake);
     Update();
     if (session::bonus_session == bonuspoints->get_Current_Session() && !bonuspoints->getBonusConsumed()) {
-      renderer.Render(snake, food, gamelayout, bonus_food);
+      renderer.Render(snake, food, bonus_food);
     } else {
-      renderer.Render(snake, food, gamelayout);
+      renderer.Render(snake, food);
     }
 
     frame_end = SDL_GetTicks();
@@ -115,10 +135,7 @@ void Game::PlaceBonusFood() {
 }
 
 void Game::Update() {
-  if (!snake.alive) {
-    //bonuspoints->informEndGame();
-    return;
-  }
+  if (!snake.alive) return;
 
   snake.Update();
 
@@ -140,8 +157,8 @@ void Game::Update() {
     int bonus_new_y = static_cast<int>(snake.head_y);
     if (bonus_food.x == bonus_new_x &&
         bonus_food.y == bonus_new_y) {
-        //TODO: update score based on bonus won
-        score++;
+        //update score based on bonus won
+        score = score + 5;
         PlaceBonusFood();
         std::cout << "placing bonus food\n" ;
         bonuspoints->informSuccess();

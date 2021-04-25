@@ -27,6 +27,7 @@ void Layout::PopulatePoints(
     const vector<vector<int>> board,
     vector<SDL_Point> &gamelayout)
 {
+  int len = 0;
   for (int i = 0; i < board.size(); i++) {
     for (int j = 0; j < board[i].size(); j++) {
       if (board[j][i] == 1) {

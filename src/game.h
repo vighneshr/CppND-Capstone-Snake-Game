@@ -12,6 +12,61 @@
 #include "bonuspoints.h"
 #include "layout.h"
 
+class Renderer;
+
+class Portable {
+public:
+  Portable(){};
+  Portable(int len) {
+    //Portable() {
+    std::cout << "CREATING instance of Portable :" << this << std::endl;
+    length = len;
+    point = new SDL_Point[len];
+  }
+  ~Portable() {
+    std::cout << "DELETING instance of Portable :" << this << std::endl;
+    delete[] point;
+  };
+  Portable(const Portable &source) {
+    std::cout << "COPYING " << &source << " instance to instance: " << this << std::endl;
+    length = source.length;
+    point = new SDL_Point[length];
+    *point = *source.point;
+  }
+
+  Portable &operator= (const Portable &source) {
+    std::cout << "ASSIGNING " << &source << " instance to instance: " << this << std::endl;
+    delete[] point;
+    point = new SDL_Point[source.length];
+    *point = *source.point;
+    length = source.length;
+    return *this;
+  }
+
+  Portable(Portable &&source) {
+    std::cout << "MOVING " << &source << " instance to instance: " << this << std::endl;
+    length = source.length;
+    point = source.point;
+    source.length = 0;
+    source.point = nullptr;
+  }
+
+  Portable &operator= (Portable &&source) {
+    std::cout << "MOVING ASSIGNMENT" << &source << " instance to instance: " << this << std::endl;
+    delete[] point;
+    length = source.length;
+    point = source.point;
+    source.length = 0;
+    source.point = nullptr;
+    return *this;
+  }
+  friend class Renderer;
+  friend class Game;
+private:
+  SDL_Point *point;
+  int length;
+};
+
 class Game : public PreGame {
  public:
   Game(std::size_t grid_width, std::size_t grid_height);
@@ -31,6 +86,7 @@ class Game : public PreGame {
   std::vector<SDL_Point> gamelayout;
   std::unique_ptr<Bonuspoints> bonuspoints;
   std::vector<std::thread> bonus_threads;
+  Portable arr;
 
   std::random_device dev;
   std::mt19937 engine;
@@ -41,6 +97,7 @@ class Game : public PreGame {
   void PlaceFood();
   void PlaceBonusFood();
   void Update();
+  void Construct();
 
   bool setup() {
     return getUserInput();

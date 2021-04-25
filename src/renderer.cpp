@@ -38,9 +38,15 @@ Renderer::~Renderer() {
   SDL_Quit();
 }
 
+void Renderer::populateLayout(Portable &Arr) {
+  Portable p(std::move(Arr));
+  for(int i = 0; i < p.length; i++) {
+    layout.emplace_back(std::move(p.point[i]));
+  }
+}
+
 void Renderer::Render(Snake const snake,
-  SDL_Point const &food,
-  std::vector<SDL_Point> layout)
+  SDL_Point const &food)
 {
   SDL_Rect block;
   block.w = screen_width / grid_width;
@@ -90,7 +96,6 @@ void Renderer::Render(Snake const snake,
 void Renderer::Render(
   Snake const snake,
   SDL_Point const &food,
-  std::vector<SDL_Point> layout,
   SDL_Point const &bonus_food)
 {
   SDL_Rect block;
